@@ -17,6 +17,8 @@
 package ch.ivyteam.ivy.maven;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,6 +66,8 @@ public abstract class AbstractProjectCompileMojo extends AbstractEngineMojo
   
   @Parameter(defaultValue = "${localRepository}")
   protected ArtifactRepository localRepository;
+
+private File engineAppDirInUse;
   
   private static MavenProjectBuilderProxy builder;
 
@@ -89,24 +93,21 @@ public abstract class AbstractProjectCompileMojo extends AbstractEngineMojo
 
   private MavenProjectBuilderProxy getMavenProjectBuilder() throws Exception
   {
-    EngineClassLoaderFactory classLoaderFactory = getEngineClassloaderFactory();
-
-    File engineDir = identifyAndGetEngineDirectory();
-    if (builder == null)
-    {
-      builder = new MavenProjectBuilderProxy(
-              classLoaderFactory,
-              buildApplicationDirectory,
-              engineDir,
-              getLog());
-    }
-    classLoaderFactory.writeEngineClasspathJar(engineDir);
-    // share engine directory as property for custom follow up plugins:
-    if (engineDir != null)
-    {
-      project.getProperties().put(AbstractEngineMojo.ENGINE_DIRECTORY_PROPERTY, engineDir.getAbsolutePath());
-    }
-    return builder;
+	    URLClassLoader engineClassloader = getEngineClassloader(); // always instantiate -> write classpath jar!
+	    if (builder == null)
+	    {
+	      builder = new MavenProjectBuilderProxy(engineClassloader, buildApplicationDirectory, getEngineDirectory());
+	      engineAppDirInUse = buildApplicationDirectory;
+	    }
+	    return builder;
+  }
+  
+  URLClassLoader getEngineClassloader() throws IOException
+  {
+    MavenContext context = new EngineClassLoaderFactory.MavenContext(
+            repository, localRepository, project, getLog());
+    EngineClassLoaderFactory classLoaderFactory = new EngineClassLoaderFactory(context);
+    return classLoaderFactory.createEngineClassLoader(getEngineDirectory());
   }
 
   private EngineClassLoaderFactory getEngineClassloaderFactory()
@@ -119,9 +120,9 @@ public abstract class AbstractProjectCompileMojo extends AbstractEngineMojo
   protected Map<String, String> getOptions()
   {
     Map<String, String> options = new HashMap<>();
-    options.put(MavenProjectBuilderProxy.Options.TEST_SOURCE_DIR, project.getBuild().getTestSourceDirectory());
-    options.put(MavenProjectBuilderProxy.Options.COMPILE_CLASSPATH, getDependencyClasspath());
-    options.put(MavenProjectBuilderProxy.Options.SOURCE_ENCODING, encoding);
+    //options.put(MavenProjectBuilderProxy.Options.TEST_SOURCE_DIR, project.getBuild().getTestSourceDirectory());
+    //options.put(MavenProjectBuilderProxy.Options.COMPILE_CLASSPATH, getDependencyClasspath());
+    //options.put(MavenProjectBuilderProxy.Options.SOURCE_ENCODING, encoding);
     return options;
   }
 

@@ -18,8 +18,11 @@ package ch.ivyteam.ivy.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -56,9 +59,33 @@ public class CompileProjectMojo extends AbstractProjectCompileMojo
     }
     
     getLog().info("Compiling ivy Project...");
-    List<File> iarJars = projectBuilder.createIarJars(getDependencies("iar"));
-    projectBuilder.compile(project.getBasedir(), iarJars, getOptions());
+    //List<File> iarJars = projectBuilder.createIarJars(getDependencies("iar"));
+    //projectBuilder.compile(project.getBasedir(), iarJars, getOptions());
+    //writeDependencyIarJar(iarJars);
+    
+    List<File> iarJars = resolveIarDependencies();
+    projectBuilder.compile(project.getBasedir(), iarJars);
     writeDependencyIarJar(iarJars);
+    
+  }
+  
+  private List<File> resolveIarDependencies()
+  {
+    Set<org.apache.maven.artifact.Artifact> dependencies = project.getArtifacts();
+    if (dependencies == null)
+    {
+      return Collections.emptyList();
+    }
+    
+    List<File> dependentIars = new ArrayList<>();
+    for(org.apache.maven.artifact.Artifact artifact : dependencies)
+    {
+      if (artifact.getType().equals("iar"))
+      {
+        dependentIars.add(artifact.getFile());
+      }
+    }
+    return dependentIars;
   }
   
   private void writeDependencyIarJar(Collection<File> iarJarDepenencies) throws IOException

@@ -25,7 +25,7 @@ import java.util.List;
  * @author Reguel Wermelinger
  * @since 11.11.2014
  */
-class Slf4jSimpleEngineProperties
+public class Slf4jSimpleEngineProperties
 {
   private static final String PROPERTY_PREFIX = "org.slf4j.simpleLogger.";
   private static final List<String> INTERESTING_LOGGERS = Arrays.asList(
@@ -33,7 +33,7 @@ class Slf4jSimpleEngineProperties
           "ch.ivyteam.ivy.java.internal.JavaBuilder"
   );
   
-  static void install()
+  public static void install()
   {
     setDefaultProperty("showThreadName", Boolean.FALSE.toString());
     setDefaultProperty("levelInBrackets", Boolean.TRUE.toString());
@@ -68,4 +68,9 @@ class Slf4jSimpleEngineProperties
   {
     System.setProperty(PROPERTY_PREFIX+property, value);
   }
+
+public static void reset() {
+	// TODO Auto-generated method stub
+	
+}
 }

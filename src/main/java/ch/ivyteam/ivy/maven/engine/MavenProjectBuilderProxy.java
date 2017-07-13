@@ -17,6 +17,9 @@
 package ch.ivyteam.ivy.maven.engine;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -37,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 public class MavenProjectBuilderProxy
 {
   private static final String FQ_DELEGATE_CLASS_NAME = "ch.ivyteam.ivy.project.build.MavenProjectBuilder";
+public static Object Options;
   private Object delegate;
   private Class<?> delegateClass;
   private File baseDirToBuildIn;
@@ -69,6 +73,11 @@ public class MavenProjectBuilderProxy
   
   private <T> T executeInEngineDir(Callable<T> function) throws Exception
   {
+	  PrintStream out = System.out;
+	  System.setOut(new PrintStream(new OutputStream() {
+	      @Override public void write(int b) throws IOException {}
+	  }));
+	  
     String originalBaseDirectory = System.getProperty("user.dir");
     System.setProperty("user.dir", baseDirToBuildIn.getAbsolutePath());
     try
@@ -78,6 +87,7 @@ public class MavenProjectBuilderProxy
     finally
     {
       System.setProperty("user.dir", originalBaseDirectory);
+      System.setOut(out);
     }
   }
 
