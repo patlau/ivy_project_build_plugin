@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,13 +68,14 @@ public abstract class AbstractProjectCompileMojo extends AbstractEngineMojo
   @Parameter(defaultValue = "${localRepository}")
   protected ArtifactRepository localRepository;
 
-private File engineAppDirInUse;
+  private File engineAppDirInUse;
   
   private static MavenProjectBuilderProxy builder;
 
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException
   {
+	System.out.println("EXECUTE " + this.getClass().getCanonicalName());
     Slf4jSimpleEngineProperties.install();
     try
     {
@@ -107,23 +109,7 @@ private File engineAppDirInUse;
     MavenContext context = new EngineClassLoaderFactory.MavenContext(
             repository, localRepository, project, getLog());
     EngineClassLoaderFactory classLoaderFactory = new EngineClassLoaderFactory(context);
-    return classLoaderFactory.createEngineClassLoader(getEngineDirectory());
-  }
-
-  private EngineClassLoaderFactory getEngineClassloaderFactory()
-  {
-    MavenContext context = new EngineClassLoaderFactory.MavenContext(
-            repository, localRepository, project, getLog());
-    return new EngineClassLoaderFactory(context);
-  }
-
-  protected Map<String, String> getOptions()
-  {
-    Map<String, String> options = new HashMap<>();
-    //options.put(MavenProjectBuilderProxy.Options.TEST_SOURCE_DIR, project.getBuild().getTestSourceDirectory());
-    //options.put(MavenProjectBuilderProxy.Options.COMPILE_CLASSPATH, getDependencyClasspath());
-    //options.put(MavenProjectBuilderProxy.Options.SOURCE_ENCODING, encoding);
-    return options;
+    return classLoaderFactory.createEngineClassLoader(getEngineDirectory(), getDependencies("jar"));
   }
 
   private String getDependencyClasspath()

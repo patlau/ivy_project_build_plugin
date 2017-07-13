@@ -40,7 +40,6 @@ import org.apache.commons.lang3.StringUtils;
 public class MavenProjectBuilderProxy
 {
   private static final String FQ_DELEGATE_CLASS_NAME = "ch.ivyteam.ivy.project.build.MavenProjectBuilder";
-public static Object Options;
   private Object delegate;
   private Class<?> delegateClass;
   private File baseDirToBuildIn;

@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
@@ -46,6 +47,8 @@ public class EngineClassLoaderFactory
 {
   /** must match version in pom.xml */
   private static final String SLF4J_VERSION = "1.7.7";
+  private static final String JUNIT_VERSION = "4.11";
+  private static final String HAMCREST_VERSION = "1.3";
 
   private static List<String> ENGINE_LIB_DIRECTORIES = Arrays.asList(
           "lib"+File.separator+"ivy"+File.separator,
@@ -69,6 +72,28 @@ public class EngineClassLoaderFactory
     List<File> classPathWithoutLog4j = customize(ivyEngineClassPathFiles);
     return new URLClassLoader(toUrls(classPathWithoutLog4j));
   }
+
+  /**
+   * TODO: LAU: Currently it seems that the Engine class path is set only once, therefore in multi-project-builds
+   * the class path of the first project is taken by all projects.
+   * As workaround I add JUnit jars hardcoded here.
+   */
+  
+	public URLClassLoader createEngineClassLoader(File engineDirectory, List<File> dependencies) throws IOException {
+	    List<File> ivyEngineClassPathFiles = getIvyEngineClassPathFiles(engineDirectory);
+	    writeEngineClasspathJar(ivyEngineClassPathFiles);
+	    
+	    List<File> classPath = customize(ivyEngineClassPathFiles);
+	    
+	    classPath.addAll(dependencies);
+	    
+	    classPath.add(maven.getJar("junit", "junit", JUNIT_VERSION));
+	    classPath.add(maven.getJar("org.hamcrest", "hamcrest-core", HAMCREST_VERSION));
+	    
+	    // System.out.println(classPathWithoutLog4j);
+	    
+	    return new URLClassLoader(toUrls(classPath));
+	}
 
   private static List<File> getIvyEngineClassPathFiles(File engineDirectory)
   {

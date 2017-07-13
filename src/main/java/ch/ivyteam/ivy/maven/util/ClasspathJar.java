@@ -19,6 +19,7 @@ package ch.ivyteam.ivy.maven.util;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,9 +89,11 @@ public class ClasspathJar
               .collect(Collectors.toList());
   }
   
-  public String getClasspathFiles()
+  public String getClasspathFiles() throws FileNotFoundException, IOException
   {
     String urlClasspath = getClasspathUrlEntries();
+    if (urlClasspath == null)
+    	urlClasspath = "";
     if (!urlClasspath.contains(" "))
     {
       return uriToAbsoluteFilePath(urlClasspath);
@@ -116,17 +119,17 @@ public class ClasspathJar
     }
   }
   
-  public String getClasspathUrlEntries()
+  public String getClasspathUrlEntries() throws FileNotFoundException, IOException
   {
     try(ZipInputStream is = new ZipInputStream(new FileInputStream(jar)))
     {
       Manifest manifest = new Manifest(getInputStream(is, MANIFEST_MF));
-      return manifest.getEntries().values().iterator().next().getValue(Attributes.Name.CLASS_PATH);
+      Attributes next = manifest.getEntries().values().iterator().next();
+      if (next != null) {
+    	  return next.getValue(Attributes.Name.CLASS_PATH);
+      }
     }
-    catch (IOException ex)
-    {
-      return null;
-    }
+    return "";
   }
   
   private static InputStream getInputStream(ZipInputStream zin, String entry) throws IOException {

@@ -17,6 +17,8 @@
 package ch.ivyteam.ivy.maven;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -87,7 +89,15 @@ public class SetupIvyTestPropertiesMojo extends AbstractMojo
 
   private String getClasspath(File jar)
   {
-    return new ClasspathJar(jar).getClasspathFiles();
+    try {
+		return new ClasspathJar(jar).getClasspathFiles();
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IOException e) {
+		throw new RuntimeException(e);
+	}
+	return "";
   }
 
 }
