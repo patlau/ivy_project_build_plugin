@@ -52,6 +52,7 @@ public class SetupIvyTestPropertiesMojo extends AbstractMojo
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException
   {
+	System.out.println("EXECUTE " + this.getClass().getCanonicalName());
     SharedFile shared = new SharedFile(project);
     
     File engineCp = shared.getEngineClasspathJar();

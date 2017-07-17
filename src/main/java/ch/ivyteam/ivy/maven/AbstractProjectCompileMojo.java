@@ -96,6 +96,7 @@ public abstract class AbstractProjectCompileMojo extends AbstractEngineMojo
   private MavenProjectBuilderProxy getMavenProjectBuilder() throws Exception
   {
 	    URLClassLoader engineClassloader = getEngineClassloader(); // always instantiate -> write classpath jar!
+	    //System.out.println(Arrays.toString(engineClassloader.getURLs()));
 	    if (builder == null)
 	    {
 	      builder = new MavenProjectBuilderProxy(engineClassloader, buildApplicationDirectory, getEngineDirectory());
