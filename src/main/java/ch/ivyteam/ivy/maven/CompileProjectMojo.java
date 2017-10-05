@@ -18,6 +18,8 @@ package ch.ivyteam.ivy.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,6 +64,21 @@ public class CompileProjectMojo extends AbstractProjectCompileMojo
     //List<File> iarJars = projectBuilder.createIarJars(getDependencies("iar"));
     //projectBuilder.compile(project.getBasedir(), iarJars, getOptions());
     //writeDependencyIarJar(iarJars);
+    
+    try {
+    	getLog().info("Resolving localhost...");
+    	String s = InetAddress.getLocalHost().getHostAddress();
+    } catch (UnknownHostException ex) {
+    	getLog().info(ex.getLocalizedMessage());
+    }
+    try {
+    	getLog().info("Resolving localhost name...");
+    	String s = InetAddress.getLocalHost().getCanonicalHostName();
+    } catch (UnknownHostException ex) {
+    	getLog().info(ex.getLocalizedMessage());
+    }
+    
+    
     
     List<File> iarJars = resolveIarDependencies();
     projectBuilder.compile(project.getBasedir(), iarJars, getLog());
