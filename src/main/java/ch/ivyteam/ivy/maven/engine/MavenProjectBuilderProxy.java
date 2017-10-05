@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.logging.Log;
+
+import ch.ivyteam.ivy.maven.CompileProjectMojo;
 
 /**
  * Provides project build functionality that can only be accessed trough reflection on an ivy Engine classloader.
@@ -63,8 +66,10 @@ public class MavenProjectBuilderProxy
     return StringUtils.join(pathEntries, File.pathSeparator);
   }
   
-  public void compile(File projectDirToBuild, List<File> iarDependencies) throws Exception
+  public void compile(File projectDirToBuild, List<File> iarDependencies, Log log) throws Exception
   {
+
+	log.info("Compile...");
     Method mainMethod = delegateClass.getDeclaredMethod("execute", File.class, List.class);
     executeInEngineDir(() -> 
       mainMethod.invoke(delegate, projectDirToBuild, iarDependencies)
@@ -82,10 +87,12 @@ public class MavenProjectBuilderProxy
     System.setProperty("user.dir", baseDirToBuildIn.getAbsolutePath());
     try
     {
+      out.println("  ... Beginn Engine");
       return function.call();
     }
     finally
     {
+      out.println("  ... End Engine");
       System.setProperty("user.dir", originalBaseDirectory);
       System.setOut(out);
     }

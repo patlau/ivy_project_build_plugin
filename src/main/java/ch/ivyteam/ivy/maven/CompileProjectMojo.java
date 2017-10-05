@@ -64,13 +64,14 @@ public class CompileProjectMojo extends AbstractProjectCompileMojo
     //writeDependencyIarJar(iarJars);
     
     List<File> iarJars = resolveIarDependencies();
-    projectBuilder.compile(project.getBasedir(), iarJars);
+    projectBuilder.compile(project.getBasedir(), iarJars, getLog());
     writeDependencyIarJar(iarJars);
     
   }
   
   private List<File> resolveIarDependencies()
   {
+	getLog().info("Resolve dependencies...");
     Set<org.apache.maven.artifact.Artifact> dependencies = project.getArtifacts();
     if (dependencies == null)
     {
@@ -90,6 +91,7 @@ public class CompileProjectMojo extends AbstractProjectCompileMojo
   
   private void writeDependencyIarJar(Collection<File> iarJarDepenencies) throws IOException
   {
+		getLog().info("Write dependency iar...");
     if (iarJarDepenencies == null)
     { // no dependencies
       return;
