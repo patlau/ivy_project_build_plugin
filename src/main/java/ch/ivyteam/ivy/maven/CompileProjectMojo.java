@@ -67,6 +67,12 @@ public class CompileProjectMojo extends AbstractProjectCompileMojo
     
     try {
     	getLog().info("Resolving localhost...");
+    	InetAddress.getLocalHost();
+    } catch (UnknownHostException ex) {
+    	getLog().info(ex.getLocalizedMessage());
+    }
+    try {
+    	getLog().info("Resolving localhost address...");
     	String s = InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException ex) {
     	getLog().info(ex.getLocalizedMessage());
